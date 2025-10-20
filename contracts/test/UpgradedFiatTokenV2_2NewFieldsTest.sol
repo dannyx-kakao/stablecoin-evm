@@ -18,13 +18,13 @@
 
 pragma solidity 0.6.12;
 
-import { FiatTokenV2_2 } from "../v2/FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../v2/FiatTokenV2.sol";
 
 /**
  * @title UpgradedFiatTokenV2_2NewFieldsTest
  * @dev ERC20 Token backed by fiat reserves
  */
-contract UpgradedFiatTokenV2_2NewFieldsTest is FiatTokenV2_2 {
+contract UpgradedFiatTokenV2_2NewFieldsTest is FiatTokenV2 {
     bool public newBool;
     address public newAddress;
     uint256 public newUint;

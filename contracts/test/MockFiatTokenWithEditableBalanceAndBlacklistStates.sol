@@ -18,7 +18,7 @@
 
 pragma solidity 0.6.12;
 
-import { FiatTokenV2_2 } from "../v2/FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../v2/FiatTokenV2.sol";
 
 // solhint-disable func-name-mixedcase
 
@@ -26,7 +26,7 @@ import { FiatTokenV2_2 } from "../v2/FiatTokenV2_2.sol";
  * @title MockFiatTokenWithEditableBalanceAndBlacklistStates
  * @dev A mock class that allows the internal balanceAndBlacklistStates to be manipulated in tests.
  */
-contract MockFiatTokenWithEditableBalanceAndBlacklistStates is FiatTokenV2_2 {
+contract MockFiatTokenWithEditableBalanceAndBlacklistStates is FiatTokenV2 {
     /**
      * @dev Allows the balanceAndBlacklistStates to be manipulated. This
      * enables us to properly test the ERC20 functionalities.

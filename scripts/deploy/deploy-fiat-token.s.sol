@@ -22,7 +22,7 @@ import "forge-std/console.sol"; // solhint-disable no-global-import, no-console
 import { Script } from "forge-std/Script.sol";
 import { DeployImpl } from "./DeployImpl.sol";
 import { FiatTokenProxy } from "../../contracts/v1/FiatTokenProxy.sol";
-import { FiatTokenV2_2 } from "../../contracts/v2/FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../../contracts/v2/FiatTokenV2.sol";
 import { MasterMinter } from "../../contracts/minting/MasterMinter.sol";
 
 /**
@@ -86,7 +86,7 @@ contract DeployFiatToken is Script, DeployImpl {
     function _deploy(address _impl)
         internal
         returns (
-            FiatTokenV2_2,
+            FiatTokenV2,
             MasterMinter,
             FiatTokenProxy
         )
@@ -96,9 +96,9 @@ contract DeployFiatToken is Script, DeployImpl {
         // If there is an existing implementation contract,
         // we can simply point the newly deployed proxy contract to it.
         // Otherwise, deploy the latest implementation contract code to the network.
-        FiatTokenV2_2 fiatTokenV2_2 = getOrDeployImpl(_impl);
+        FiatTokenV2 fiatTokenV2 = getOrDeployImpl(_impl);
 
-        FiatTokenProxy proxy = new FiatTokenProxy(address(fiatTokenV2_2));
+        FiatTokenProxy proxy = new FiatTokenProxy(address(fiatTokenV2));
 
         // Now that the proxy contract has been deployed, we can deploy the master minter.
         MasterMinter masterMinter = new MasterMinter(address(proxy));
@@ -115,8 +115,8 @@ contract DeployFiatToken is Script, DeployImpl {
         // Do the initial (V1) initialization.
         // Note that this takes in the master minter contract's address as the master minter.
         // The master minter contract's owner is a separate address.
-        FiatTokenV2_2 proxyAsV2_2 = FiatTokenV2_2(address(proxy));
-        proxyAsV2_2.initialize(
+        FiatTokenV2 proxyAsV2 = FiatTokenV2(address(proxy));
+        proxyAsV2.initialize(
             tokenName,
             tokenSymbol,
             tokenCurrency,
@@ -127,18 +127,12 @@ contract DeployFiatToken is Script, DeployImpl {
             owner
         );
 
-        // Do the V2 initialization
-        proxyAsV2_2.initializeV2(tokenName);
-
-        // Do the V2_1 initialization
-        proxyAsV2_2.initializeV2_1(owner);
-
-        // Do the V2_2 initialization
-        proxyAsV2_2.initializeV2_2(new address[](0), tokenSymbol);
+        // Do the consolidated V2 initialization (includes V2, V2.1, and V2.2)
+        proxyAsV2.initializeV2(tokenName, tokenSymbol, owner, new address[](0));
 
         vm.stopBroadcast();
 
-        return (fiatTokenV2_2, masterMinter, proxy);
+        return (fiatTokenV2, masterMinter, proxy);
     }
 
     /**
@@ -147,7 +141,7 @@ contract DeployFiatToken is Script, DeployImpl {
     function deploy(address _impl)
         external
         returns (
-            FiatTokenV2_2,
+            FiatTokenV2,
             MasterMinter,
             FiatTokenProxy
         )
@@ -161,7 +155,7 @@ contract DeployFiatToken is Script, DeployImpl {
     function run()
         external
         returns (
-            FiatTokenV2_2,
+            FiatTokenV2,
             MasterMinter,
             FiatTokenProxy
         )

@@ -23,7 +23,7 @@ import { TestUtils } from "./TestUtils.sol";
 import {
     DeployImplAndUpgrader
 } from "../../../scripts/deploy/deploy-impl-and-upgrader.s.sol";
-import { FiatTokenV2_2 } from "../../../contracts/v2/FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../../../contracts/v2/FiatTokenV2.sol";
 import { V2_2Upgrader } from "../../../contracts/v2/upgrader/V2_2Upgrader.sol";
 
 // solhint-disable func-name-mixedcase
@@ -40,19 +40,19 @@ contract DeployImplAndUpgraderTest is TestUtils {
     }
 
     function test_DeployImplAndUpgraderWithAllEnvConfigured() public {
-        (FiatTokenV2_2 v2_2, V2_2Upgrader upgrader) = deployScript.run();
+        (FiatTokenV2 v2, V2_2Upgrader upgrader) = deployScript.run();
 
-        validateImpl(v2_2);
+        validateImpl(v2);
         validateUpgrader(
             upgrader,
             vm.envAddress("FIAT_TOKEN_PROXY_ADDRESS"),
-            address(v2_2)
+            address(v2)
         );
     }
 
     function test_DeployImplAndUpgraderWithPredeployedImpl() public {
         vm.prank(deployer);
-        FiatTokenV2_2 predeployedImpl = new FiatTokenV2_2();
+        FiatTokenV2 predeployedImpl = new FiatTokenV2();
 
         (, V2_2Upgrader upgrader) = deployScript.deploy(
             address(predeployedImpl)

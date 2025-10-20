@@ -28,7 +28,7 @@ import {
 } from "../../../../scripts/deploy/celo/deploy-fee-adapter.s.sol";
 
 import { FiatTokenProxy } from "../../../../contracts/v1/FiatTokenProxy.sol";
-import { FiatTokenV2_2 } from "../../../../contracts/v2/FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../../../../contracts/v2/FiatTokenV2.sol";
 import {
     FiatTokenCeloV2_2
 } from "../../../../contracts/v2/celo/FiatTokenCeloV2_2.sol";

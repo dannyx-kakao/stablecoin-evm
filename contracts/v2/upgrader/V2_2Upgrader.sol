@@ -19,7 +19,7 @@
 pragma solidity 0.6.12;
 
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
-import { FiatTokenV2_2 } from "../FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../FiatTokenV2.sol";
 import { FiatTokenProxy } from "../../v1/FiatTokenProxy.sol";
 import { V2_2UpgraderHelper } from "./helpers/V2_2UpgraderHelper.sol";
 import { AbstractV2Upgrader } from "./AbstractV2Upgrader.sol";
@@ -56,14 +56,14 @@ contract V2_2Upgrader is AbstractV2Upgrader {
     /**
      * @notice Constructor
      * @param proxy               FiatTokenProxy contract
-     * @param implementation      FiatTokenV2_2 implementation contract
+     * @param implementation      FiatTokenV2 implementation contract
      * @param newProxyAdmin       Grantee of proxy admin role after upgrade
      * @param accountsToBlacklist Accounts to add to the new blacklist data structure
      * @param newSymbol           New token symbol
      */
     constructor(
         FiatTokenProxy proxy,
-        FiatTokenV2_2 implementation,
+        FiatTokenV2 implementation,
         address newProxyAdmin,
         address[] memory accountsToBlacklist,
         string memory newSymbol
@@ -120,25 +120,25 @@ contract V2_2Upgrader is AbstractV2Upgrader {
         // Transfer proxy admin role
         _proxy.changeAdmin(_newProxyAdmin);
 
-        // Initialize V2 contract
-        FiatTokenV2_2 v2_2 = FiatTokenV2_2(address(_proxy));
-        v2_2.initializeV2_2(_accountsToBlacklist, _newSymbol);
+        // Initialize V2 contract (V2.2 upgrade)
+        FiatTokenV2 v2 = FiatTokenV2(address(_proxy));
+        v2.initializeV2_2(_accountsToBlacklist, _newSymbol);
 
         // Sanity test
         // Check metadata
         FiatTokenMetadata memory upgradedMetadata = FiatTokenMetadata(
-            v2_2.name(),
-            v2_2.decimals(),
-            v2_2.currency(),
-            v2_2.version(),
-            v2_2.DOMAIN_SEPARATOR(),
-            v2_2.masterMinter(),
-            v2_2.owner(),
-            v2_2.pauser(),
-            v2_2.blacklister(),
-            v2_2.rescuer(),
-            v2_2.paused(),
-            v2_2.totalSupply()
+            v2.name(),
+            v2.decimals(),
+            v2.currency(),
+            v2.version(),
+            v2.DOMAIN_SEPARATOR(),
+            v2.masterMinter(),
+            v2.owner(),
+            v2.pauser(),
+            v2.blacklister(),
+            v2.rescuer(),
+            v2.paused(),
+            v2.totalSupply()
         );
         require(
             checkFiatTokenMetadataEqual(originalMetadata, upgradedMetadata),
@@ -147,32 +147,32 @@ contract V2_2Upgrader is AbstractV2Upgrader {
 
         // Check symbol is updated
         require(
-            keccak256(bytes(v2_2.symbol())) == keccak256(bytes(_newSymbol)),
+            keccak256(bytes(v2.symbol())) == keccak256(bytes(_newSymbol)),
             "V2_2Upgrader: symbol not updated"
         );
 
         // Test balanceOf
         require(
-            v2_2.balanceOf(address(this)) == contractBal,
+            v2.balanceOf(address(this)) == contractBal,
             "V2_2Upgrader: balanceOf test failed"
         );
 
         // Test transfer
         require(
-            v2_2.transfer(msg.sender, 1e5) &&
-                v2_2.balanceOf(msg.sender) == callerBal.add(1e5) &&
-                v2_2.balanceOf(address(this)) == contractBal.sub(1e5),
+            v2.transfer(msg.sender, 1e5) &&
+                v2.balanceOf(msg.sender) == callerBal.add(1e5) &&
+                v2.balanceOf(address(this)) == contractBal.sub(1e5),
             "V2_2Upgrader: transfer test failed"
         );
 
         // Test approve/transferFrom
         require(
-            v2_2.approve(address(v2_2Helper), 1e5) &&
-                v2_2.allowance(address(this), address(v2_2Helper)) == 1e5 &&
+            v2.approve(address(v2_2Helper), 1e5) &&
+                v2.allowance(address(this), address(v2_2Helper)) == 1e5 &&
                 v2_2Helper.transferFrom(address(this), msg.sender, 1e5) &&
-                v2_2.allowance(address(this), msg.sender) == 0 &&
-                v2_2.balanceOf(msg.sender) == callerBal.add(2e5) &&
-                v2_2.balanceOf(address(this)) == contractBal.sub(2e5),
+                v2.allowance(address(this), msg.sender) == 0 &&
+                v2.balanceOf(msg.sender) == callerBal.add(2e5) &&
+                v2.balanceOf(address(this)) == contractBal.sub(2e5),
             "V2_2Upgrader: approve/transferFrom test failed"
         );
 

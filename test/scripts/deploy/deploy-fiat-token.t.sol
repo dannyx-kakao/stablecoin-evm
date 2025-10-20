@@ -25,7 +25,7 @@ import {
 } from "../../../scripts/deploy/deploy-fiat-token.s.sol";
 import { MasterMinter } from "../../../contracts/minting/MasterMinter.sol";
 import { FiatTokenProxy } from "../../../contracts/v1/FiatTokenProxy.sol";
-import { FiatTokenV2_2 } from "../../../contracts/v2/FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../../../contracts/v2/FiatTokenV2.sol";
 
 // solhint-disable func-name-mixedcase
 
@@ -42,19 +42,19 @@ contract DeployFiatTokenTest is TestUtils {
 
     function test_deployFiatTokenWithEnvConfigured() public {
         (
-            FiatTokenV2_2 v2_2,
+            FiatTokenV2 v2,
             MasterMinter masterMinter,
             FiatTokenProxy proxy
         ) = deployScript.run();
 
-        validateImpl(v2_2);
+        validateImpl(v2);
         validateMasterMinter(masterMinter, address(proxy));
-        validateProxy(proxy, address(v2_2), address(masterMinter));
+        validateProxy(proxy, address(v2), address(masterMinter));
     }
 
     function test_deployFiatTokenWithPredeployedImpl() public {
         vm.prank(deployer);
-        FiatTokenV2_2 predeployedImpl = new FiatTokenV2_2();
+        FiatTokenV2 predeployedImpl = new FiatTokenV2();
 
         (, MasterMinter masterMinter, FiatTokenProxy proxy) = deployScript
             .deploy(address(predeployedImpl));
@@ -71,14 +71,14 @@ contract DeployFiatTokenTest is TestUtils {
         assertEq(proxy.admin(), proxyAdmin);
         assertEq(proxy.implementation(), _impl);
 
-        FiatTokenV2_2 proxyAsV2_2 = FiatTokenV2_2(address(proxy));
-        assertEq(proxyAsV2_2.name(), "USDC");
-        assertEq(proxyAsV2_2.symbol(), "USDC");
-        assertEq(proxyAsV2_2.currency(), "USD");
-        assert(proxyAsV2_2.decimals() == 6);
-        assertEq(proxyAsV2_2.owner(), owner);
-        assertEq(proxyAsV2_2.pauser(), pauser);
-        assertEq(proxyAsV2_2.blacklister(), blacklister);
-        assertEq(proxyAsV2_2.masterMinter(), _masterMinter);
+        FiatTokenV2 proxyAsV2 = FiatTokenV2(address(proxy));
+        assertEq(proxyAsV2.name(), "USDC");
+        assertEq(proxyAsV2.symbol(), "USDC");
+        assertEq(proxyAsV2.currency(), "USD");
+        assert(proxyAsV2.decimals() == 6);
+        assertEq(proxyAsV2.owner(), owner);
+        assertEq(proxyAsV2.pauser(), pauser);
+        assertEq(proxyAsV2.blacklister(), blacklister);
+        assertEq(proxyAsV2.masterMinter(), _masterMinter);
     }
 }

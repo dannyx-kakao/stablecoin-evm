@@ -18,7 +18,7 @@
 
 pragma solidity 0.6.12;
 
-import { FiatTokenV2_1 } from "../../../v2/FiatTokenV2_1.sol";
+import { FiatTokenV2 } from "../../../v2/FiatTokenV2.sol";
 import { V2UpgraderHelper } from "./V2UpgraderHelper.sol";
 
 /**
@@ -42,7 +42,7 @@ contract V2_2UpgraderHelper is V2UpgraderHelper {
      * @return version
      */
     function version() external view returns (string memory) {
-        return FiatTokenV2_1(_proxy).version();
+        return FiatTokenV2(_proxy).version();
     }
 
     /**
@@ -51,7 +51,7 @@ contract V2_2UpgraderHelper is V2UpgraderHelper {
      */
     // solhint-disable-next-line func-name-mixedcase
     function DOMAIN_SEPARATOR() external view returns (bytes32) {
-        return FiatTokenV2_1(_proxy).DOMAIN_SEPARATOR();
+        return FiatTokenV2(_proxy).DOMAIN_SEPARATOR();
     }
 
     /**
@@ -59,7 +59,7 @@ contract V2_2UpgraderHelper is V2UpgraderHelper {
      * @return rescuer
      */
     function rescuer() external view returns (address) {
-        return FiatTokenV2_1(_proxy).rescuer();
+        return FiatTokenV2(_proxy).rescuer();
     }
 
     /**
@@ -67,7 +67,7 @@ contract V2_2UpgraderHelper is V2UpgraderHelper {
      * @return paused
      */
     function paused() external view returns (bool) {
-        return FiatTokenV2_1(_proxy).paused();
+        return FiatTokenV2(_proxy).paused();
     }
 
     /**
@@ -75,6 +75,6 @@ contract V2_2UpgraderHelper is V2UpgraderHelper {
      * @return totalSupply
      */
     function totalSupply() external view returns (uint256) {
-        return FiatTokenV2_1(_proxy).totalSupply();
+        return FiatTokenV2(_proxy).totalSupply();
     }
 }

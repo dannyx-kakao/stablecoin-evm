@@ -132,14 +132,13 @@ contract DeployFiatTokenCelo is Script, DeployImpl {
             owner
         );
 
-        // Do the V2 initialization
-        proxyAsV2_2.initializeV2(tokenName);
-
-        // Do the V2_1 initialization
-        proxyAsV2_2.initializeV2_1(lostAndFound);
-
-        // Do the V2_2 initialization
-        proxyAsV2_2.initializeV2_2(new address[](0), tokenSymbol);
+        // Do the consolidated V2 initialization (includes V2, V2.1, and V2.2)
+        proxyAsV2_2.initializeV2(
+            tokenName,
+            tokenSymbol,
+            lostAndFound,
+            new address[](0)
+        );
 
         vm.stopBroadcast();
 

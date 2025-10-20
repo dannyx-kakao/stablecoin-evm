@@ -18,13 +18,13 @@
 
 pragma solidity 0.6.12;
 
-import { FiatTokenV2_2 } from "../v2/FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../v2/FiatTokenV2.sol";
 
 /**
  * @title MockFiatTokenWithEditableChainId
  * @dev A mock class to simulate chain ID change as a result of blockchain forks
  */
-contract MockFiatTokenWithEditableChainId is FiatTokenV2_2 {
+contract MockFiatTokenWithEditableChainId is FiatTokenV2 {
     uint256 private _internalChainId = 1;
 
     /**

@@ -23,12 +23,19 @@ import { AbstractFiatTokenV1 } from "./AbstractFiatTokenV1.sol";
 import { Ownable } from "./Ownable.sol";
 import { Pausable } from "./Pausable.sol";
 import { Blacklistable } from "./Blacklistable.sol";
+import { Rescuable } from "./Rescuable.sol";
 
 /**
  * @title FiatToken
  * @dev ERC20 Token backed by fiat reserves
  */
-contract FiatTokenV1 is AbstractFiatTokenV1, Ownable, Pausable, Blacklistable {
+contract FiatTokenV1 is
+    AbstractFiatTokenV1,
+    Ownable,
+    Pausable,
+    Blacklistable,
+    Rescuable
+{
     using SafeMath for uint256;
 
     string public name;

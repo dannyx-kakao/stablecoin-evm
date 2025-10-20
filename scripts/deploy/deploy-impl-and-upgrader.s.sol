@@ -23,7 +23,7 @@ import { Script } from "forge-std/Script.sol";
 import { ScriptUtils } from "./ScriptUtils.sol";
 import { DeployImpl } from "./DeployImpl.sol";
 import { FiatTokenProxy } from "../../contracts/v1/FiatTokenProxy.sol";
-import { FiatTokenV2_2 } from "../../contracts/v2/FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../../contracts/v2/FiatTokenV2.sol";
 import { V2_2Upgrader } from "../../contracts/v2/upgrader/V2_2Upgrader.sol";
 
 /**
@@ -75,22 +75,22 @@ contract DeployImplAndUpgrader is Script, DeployImpl, ScriptUtils {
      */
     function _deploy(address _impl)
         internal
-        returns (FiatTokenV2_2, V2_2Upgrader)
+        returns (FiatTokenV2, V2_2Upgrader)
     {
         vm.startBroadcast(deployerPrivateKey);
 
-        FiatTokenV2_2 fiatTokenV2_2 = getOrDeployImpl(_impl);
+        FiatTokenV2 fiatTokenV2 = getOrDeployImpl(_impl);
 
         V2_2Upgrader v2_2Upgrader = new V2_2Upgrader(
             FiatTokenProxy(proxyContractAddress),
-            fiatTokenV2_2,
+            fiatTokenV2,
             proxyAdmin,
             accountsToBlacklist,
             newTokenSymbol
         );
 
         vm.stopBroadcast();
-        return (fiatTokenV2_2, v2_2Upgrader);
+        return (fiatTokenV2, v2_2Upgrader);
     }
 
     /**
@@ -98,7 +98,7 @@ contract DeployImplAndUpgrader is Script, DeployImpl, ScriptUtils {
      */
     function deploy(address _impl)
         external
-        returns (FiatTokenV2_2, V2_2Upgrader)
+        returns (FiatTokenV2, V2_2Upgrader)
     {
         return _deploy(_impl);
     }
@@ -106,7 +106,7 @@ contract DeployImplAndUpgrader is Script, DeployImpl, ScriptUtils {
     /**
      * @notice main function that will be run by forge
      */
-    function run() external returns (FiatTokenV2_2, V2_2Upgrader) {
+    function run() external returns (FiatTokenV2, V2_2Upgrader) {
         return _deploy(impl);
     }
 }

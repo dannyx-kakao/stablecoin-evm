@@ -19,7 +19,7 @@
 pragma solidity 0.6.12;
 
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
-import { FiatTokenV2_1 } from "../FiatTokenV2_1.sol";
+import { FiatTokenV2 } from "../FiatTokenV2.sol";
 import { FiatTokenProxy } from "../../v1/FiatTokenProxy.sol";
 import { V2UpgraderHelper } from "./helpers/V2UpgraderHelper.sol";
 import { AbstractV2Upgrader } from "./AbstractV2Upgrader.sol";
@@ -40,13 +40,13 @@ contract V2_1Upgrader is AbstractV2Upgrader {
     /**
      * @notice Constructor
      * @param proxy             FiatTokenProxy contract
-     * @param implementation    FiatTokenV2_1 implementation contract
+     * @param implementation    FiatTokenV2 implementation contract
      * @param newProxyAdmin     Grantee of proxy admin role after upgrade
      * @param lostAndFound      The address to which the locked funds are sent
      */
     constructor(
         FiatTokenProxy proxy,
-        FiatTokenV2_1 implementation,
+        FiatTokenV2 implementation,
         address newProxyAdmin,
         address lostAndFound
     ) public AbstractV2Upgrader(proxy, address(implementation), newProxyAdmin) {
@@ -96,47 +96,46 @@ contract V2_1Upgrader is AbstractV2Upgrader {
         // Transfer proxy admin role
         _proxy.changeAdmin(_newProxyAdmin);
 
-        // Initialize V2 contract
-        FiatTokenV2_1 v2_1 = FiatTokenV2_1(address(_proxy));
-        v2_1.initializeV2_1(_lostAndFound);
+        // Initialize V2 contract (V2.1 upgrade)
+        FiatTokenV2 v2 = FiatTokenV2(address(_proxy));
+        v2.initializeV2_1(_lostAndFound);
 
         // Sanity test
         // Check metadata
         require(
-            keccak256(bytes(name)) == keccak256(bytes(v2_1.name())) &&
-                keccak256(bytes(symbol)) == keccak256(bytes(v2_1.symbol())) &&
-                decimals == v2_1.decimals() &&
-                keccak256(bytes(currency)) ==
-                keccak256(bytes(v2_1.currency())) &&
-                masterMinter == v2_1.masterMinter() &&
-                owner == v2_1.owner() &&
-                pauser == v2_1.pauser() &&
-                blacklister == v2_1.blacklister(),
+            keccak256(bytes(name)) == keccak256(bytes(v2.name())) &&
+                keccak256(bytes(symbol)) == keccak256(bytes(v2.symbol())) &&
+                decimals == v2.decimals() &&
+                keccak256(bytes(currency)) == keccak256(bytes(v2.currency())) &&
+                masterMinter == v2.masterMinter() &&
+                owner == v2.owner() &&
+                pauser == v2.pauser() &&
+                blacklister == v2.blacklister(),
             "V2_1Upgrader: metadata test failed"
         );
 
         // Test balanceOf
         require(
-            v2_1.balanceOf(address(this)) == contractBal,
+            v2.balanceOf(address(this)) == contractBal,
             "V2_1Upgrader: balanceOf test failed"
         );
 
         // Test transfer
         require(
-            v2_1.transfer(msg.sender, 1e5) &&
-                v2_1.balanceOf(msg.sender) == callerBal.add(1e5) &&
-                v2_1.balanceOf(address(this)) == contractBal.sub(1e5),
+            v2.transfer(msg.sender, 1e5) &&
+                v2.balanceOf(msg.sender) == callerBal.add(1e5) &&
+                v2.balanceOf(address(this)) == contractBal.sub(1e5),
             "V2_1Upgrader: transfer test failed"
         );
 
         // Test approve/transferFrom
         require(
-            v2_1.approve(address(v2_1Helper), 1e5) &&
-                v2_1.allowance(address(this), address(v2_1Helper)) == 1e5 &&
+            v2.approve(address(v2_1Helper), 1e5) &&
+                v2.allowance(address(this), address(v2_1Helper)) == 1e5 &&
                 v2_1Helper.transferFrom(address(this), msg.sender, 1e5) &&
-                v2_1.allowance(address(this), msg.sender) == 0 &&
-                v2_1.balanceOf(msg.sender) == callerBal.add(2e5) &&
-                v2_1.balanceOf(address(this)) == contractBal.sub(2e5),
+                v2.allowance(address(this), msg.sender) == 0 &&
+                v2.balanceOf(msg.sender) == callerBal.add(2e5) &&
+                v2.balanceOf(address(this)) == contractBal.sub(2e5),
             "V2_1Upgrader: approve/transferFrom test failed"
         );
 

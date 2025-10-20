@@ -22,7 +22,7 @@ pragma experimental ABIEncoderV2; // needed for compiling older solc versions: h
 import "forge-std/Test.sol"; // solhint-disable no-global-import
 import { MasterMinter } from "../../../contracts/minting/MasterMinter.sol";
 import { FiatTokenProxy } from "../../../contracts/v1/FiatTokenProxy.sol";
-import { FiatTokenV2_2 } from "../../../contracts/v2/FiatTokenV2_2.sol";
+import { FiatTokenV2 } from "../../../contracts/v2/FiatTokenV2.sol";
 import {
     AbstractV2Upgrader
 } from "../../../contracts/v2/upgrader/AbstractV2Upgrader.sol";
@@ -74,18 +74,18 @@ contract TestUtils is Test {
 
         // Deploy an instance of proxy contract to configure contract address in env
         vm.prank(deployer);
-        FiatTokenV2_2 v2_2 = new FiatTokenV2_2();
+        FiatTokenV2 v2 = new FiatTokenV2();
 
         vm.prank(proxyAdmin);
-        FiatTokenProxy proxy = new FiatTokenProxy(address(v2_2));
+        FiatTokenProxy proxy = new FiatTokenProxy(address(v2));
 
         vm.startPrank(deployer);
         MasterMinter masterMinter = new MasterMinter(address(proxy));
         masterMinter.transferOwnership(masterMinterOwner);
 
-        FiatTokenV2_2 proxyAsV2_2 = FiatTokenV2_2(address(proxy));
+        FiatTokenV2 proxyAsV2 = FiatTokenV2(address(proxy));
 
-        proxyAsV2_2.initialize(
+        proxyAsV2.initialize(
             tokenName,
             tokenSymbol,
             "USD",
@@ -95,9 +95,8 @@ contract TestUtils is Test {
             blacklister,
             vm.addr(ownerPrivateKey)
         );
-        proxyAsV2_2.initializeV2(tokenName);
-        proxyAsV2_2.initializeV2_1(owner);
-        proxyAsV2_2.initializeV2_2(new address[](0), tokenSymbol);
+        // Use consolidated initialization (V2 + V2.1 + V2.2 in one call)
+        proxyAsV2.initializeV2(tokenName, tokenSymbol, owner, new address[](0));
         vm.setEnv("FIAT_TOKEN_PROXY_ADDRESS", vm.toString(address(proxy)));
 
         vm.setEnv("BLACKLIST_FILE_NAME", blacklistFileName);
@@ -125,9 +124,13 @@ contract TestUtils is Test {
             blacklister,
             owner
         );
-        proxyAsV2_2.initializeV2(tokenName);
-        proxyAsV2_2.initializeV2_1(owner);
-        proxyAsV2_2.initializeV2_2(new address[](0), tokenSymbol);
+        // Use consolidated initialization (V2 + V2.1 + V2.2 in one call)
+        proxyAsV2_2.initializeV2(
+            tokenName,
+            tokenSymbol,
+            owner,
+            new address[](0)
+        );
         vm.stopPrank();
 
         vm.setEnv("FIAT_TOKEN_CELO_PROXY_ADDRESS", vm.toString(address(proxy)));
@@ -135,7 +138,7 @@ contract TestUtils is Test {
         vm.setEnv("FEE_ADAPTER_DECIMALS", "18");
     }
 
-    function validateImpl(FiatTokenV2_2 impl) internal {
+    function validateImpl(FiatTokenV2 impl) internal {
         assertEq(impl.name(), "");
         assertEq(impl.symbol(), "");
         assertEq(impl.currency(), "");
